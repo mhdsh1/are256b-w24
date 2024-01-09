@@ -11,7 +11,8 @@ ARE 256B Winter 2024 TA Sections
   public economics, and econometrics plays a crucial role in my work. 
 - I'm here to assist you, so feel free to reach out with any questions or 
   concerns.
-- As a native Farsi (Persian) speaker, English is not my first language. 
+- English is not my first language. My mother tongue is 
+  [Farsi (Persian)](https://simple.wikipedia.org/wiki/Persian_language).  
   Clarity is important to me, so please feel free to let me know if you notice
   any unusual pronunciations. 
 
@@ -25,6 +26,9 @@ ARE 256B Winter 2024 TA Sections
   
 - option 2
 	- https://virtuallab.ucdavis.edu/
+
+- option 3
+  - ARE Computer Lab
 
 ## Week 2 - Jan 19
 
