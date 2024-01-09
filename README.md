@@ -12,7 +12,7 @@ ARE 256B Winter 2024 TA Sections
 - I'm here to assist you, so feel free to reach out with any questions or 
   concerns.
 - English is not my first language. My mother tongue is 
-  [Farsi (Persian)](https://simple.wikipedia.org/wiki/Persian_language).  
+  [Farsi (Persian)](https://simple.wikipedia.org/wiki/Persian_language). 
   Clarity is important to me, so please feel free to let me know if you notice
   any unusual pronunciations. 
 
