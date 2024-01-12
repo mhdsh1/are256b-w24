@@ -2,8 +2,8 @@
 \usetheme{default}
 
 % setting allowframebreaks as default
-%\let\oldframe\frame
-%\renewcommand\frame[1][allowframebreaks]{\oldframe[#1]}
+\let\oldframe\frame
+\renewcommand\frame[1][allowframebreaks]{\oldframe[#1]}
 
 \title{Welcome to ARE 256B Sections!} 
 \author{Mahdi Shams}
@@ -77,6 +77,13 @@
 \begin{frame}{Stata Basics}
 
 \begin{itemize}
+\item type \texttt{doed} in the command window to open the do-file editor
+\item asking help 1: \texttt{help} "command"
+\item asking help 2: google \emph{help "command" stata}
+\item basic stata syntax: \texttt{command varlist if in, options}
+\end{itemize}
+        
+\begin{itemize}
 \item setting working directory
 \item importing data
 \item \texttt{browse, describe}, \dots
@@ -84,7 +91,6 @@
 \item getting summary statistics: \texttt{summ, tabulate|, \dots}
 \item \texttt{gen, replace, drop, keep, \dots}
 \item using functions: \texttt{log(x)}
-
 \end{itemize}
 
 \end{frame}

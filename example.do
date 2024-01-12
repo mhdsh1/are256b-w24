@@ -5,6 +5,10 @@
 *Your name (and email adress)
 *--------------------------------------------------
 
+*set working directory 
+global path = "C:\Users\..."
+cd $path
+
 *--------------------------------------------------
 *Program Setup
 *--------------------------------------------------
@@ -12,14 +16,10 @@ version 14              // Set Version number for backward compatibility
 set more off            // Disable partitioned output
 clear all               // Start with a clean slate
 set linesize 80         // Line size limit to make output more readable
-macro drop _all         // clear all macros
+macro drop _all         // Clear all macros
 capture log close       // Close existing log files
-log using filename, replace      // Open log file
+log using filename, replace    // Open log file
 *--------------------------------------------------
-
-*set working directory 
-global path = "C:\Users\..."
-cd $path
 
 *open a .dta (Stata) file, ...
 * ... assuming datafile.dta is in data folder in the working directory 
