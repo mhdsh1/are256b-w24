@@ -26,6 +26,8 @@ HW1 DUE Jan 28
 
 ## Week 4 - Feb 2 -- MT REVIEW
 
+MT on Feb 7
+
 ## Week 5 - Feb 9
 
 ## Week 6 - Feb 16
