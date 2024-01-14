@@ -22,7 +22,9 @@ ARE 256B Winter 2024 TA Sections
 
 ## Week 3 -- Jan 26
 
-## Week 4 - Feb 2
+HW1 DUE Jan 28
+
+## Week 4 - Feb 2 -- MT REVIEW
 
 ## Week 5 - Feb 9
 
