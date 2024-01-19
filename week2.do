@@ -54,11 +54,13 @@ display _b[_cons]+_b[ASVABC]*0.3341
 display _b[_cons]+_b[ASVABC]*1.9718
 display _b[_cons]+_b[ASVABC]*(-2.2188)
 
-*Does the last predicted probability make sense? No, it yields a negative probability
+*Does the last predicted probability make sense? 
+* No, it yields a negative probability
 
 *let's find the fitted values for all the observations
 *\hat{Y}_i = \hat{\beta}X_i
-*command predict yields the fitted values for all the observations based on the "latest" model ran 
+*command predict yields the fitted values for all the observations 
+* based on the "latest" model ran 
 help predict
 predict EDUCBA_hat, xb	
 
@@ -167,7 +169,7 @@ tobit Y X, ll(0)  robust
 
 
 *--------------------------------------------------
-*exporting tables
+* presentation: exporting tables
 *--------------------------------------------------
 
 *use estout to generate nice tables
@@ -185,7 +187,7 @@ esttab model_l
 esttab model_l using outputs/model_l.rtf, replace ///
 se onecell width(\hsize) ///
 addnote() ///
-label title(Estimation Reslt of Linear Model)
+label title(Estimation Result of Linear Model)
 
 *--------------------------------------------------
  
