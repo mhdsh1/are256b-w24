@@ -1,0 +1,4 @@
+.tmp.driveupload/*
+*.aux *.log *.nav *.out *.snm 
+*.toc *.vrb *.synctex.gz *.synctex.gz
+
