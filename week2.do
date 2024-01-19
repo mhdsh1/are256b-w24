@@ -24,7 +24,7 @@ clear all               // Start with a clean slate
 set linesize 80         // Line size limit to make output more readable
 macro drop _all         // clear all macros
 capture log close       // Close existing log files
-log using week2         // Open log file
+log using week2,replace         // Open log file
 *--------------------------------------------------
 
 
@@ -61,7 +61,7 @@ display _b[_cons]+_b[ASVABC]*(-2.2188)
 *\hat{Y}_i = \hat{\beta}X_i
 *command predict yields the fitted values for all the observations 
 * based on the "latest" model ran 
-help predict
+help predict // like ? predict in R
 predict EDUCBA_hat, xb	
 
 browse EDUCBA EDUCBA_hat
@@ -72,7 +72,7 @@ count if missing(EDUCBA_hat)
 
 *Show the predicted probability graphically
 twoway scatter EDUCBA_hat ASVABC
-graph export outputs/linear.png
+graph export graphs/linear.png, replace
 
 *--------------------------------------------------
 *nonlinear model
@@ -103,6 +103,9 @@ margins, dydx(ASVABC) atmeans
 *Marginal effects evaluated at a different point
 margins, dydx(ASVABC) at(ASVABC=0.1)
 margins, dydx(ASVABC) at(ASVABC=0.6)
+
+
+// what does margins alone do?
 
 *Predict Probability
 *\hat{Y}_i = \Phi{\hat{\beta}X_i}
@@ -171,7 +174,7 @@ tobit Y X, ll(0)  robust
 *--------------------------------------------------
 * presentation: exporting tables
 *--------------------------------------------------
-
+/*
 *use estout to generate nice tables
 ssc install estout, replace
 
@@ -184,14 +187,17 @@ eststo model_p: quietly probit EDUCBA  ASVABC, robust
 esttab model_l
 
 
-esttab model_l using outputs/model_l.rtf, replace ///
+esttab model_l using graphs/model_l.rtf, replace ///
 se onecell width(\hsize) ///
 addnote() ///
 label title(Estimation Result of Linear Model)
-
+*/
 *--------------------------------------------------
  
 log close // Close the log, end the file
+
+global path "C:\Users\mahdi\are256b-w24"
+cd $path
 
 translate "$path\week2.smcl" ///
           "$path\week2.pdf", translator(smcl2pdf)
