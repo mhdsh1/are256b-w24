@@ -32,9 +32,9 @@ log using week2,replace         // Open log file
 *we use clear to reaplce the new dataset with the former one
 use "data\EAWE01.dta", clear 
 
-*--------------------------------------------------
-*linear model
-*--------------------------------------------------
+*----------------------------------------------------------------------------*
+* section 1: linear model
+*----------------------------------------------------------------------------*
 *let us work with some linear probability models
 *P(Y_i=1|X_i) = \beta X_i + \epsilon_i 
 *Prob of finishing a bachelor's degree vs composite cognitive ability test
@@ -74,9 +74,9 @@ count if missing(EDUCBA_hat)
 twoway scatter EDUCBA_hat ASVABC
 graph export graphs/linear.png, replace
 
-*--------------------------------------------------
-*nonlinear model
-*--------------------------------------------------
+*----------------------------------------------------------------------------*
+* sction 2: nonlinear model
+*----------------------------------------------------------------------------*
 
 *let us move to non-linear probability models
 *Non-linear probability models map the dependent variables using a function
@@ -89,8 +89,10 @@ graph export graphs/linear.png, replace
 probit EDUCBA  ASVABC, robust 
 *Compare results with Linear Probability Model
 
-*--------------------------------------------------
-	
+*----------------------------------------------------------------------------*
+* section 3: computing marginal effects 
+*----------------------------------------------------------------------------*
+
 *Computing marginal effects
 *Look at Slides 68-69 for definitions
 *Average Margnal Effect
@@ -123,9 +125,9 @@ predict EDUCBA_probit_hat
 browse EDUCBA EDUCBA_hat EDUCBA_probit_hat
 twoway (scatter EDUCBA_probit_hat ASVABC)
 
-*--------------------------------------------------
-*model comparison based on rmse
-*--------------------------------------------------
+*----------------------------------------------------------------------------*
+* section 4: model comparison based on rmse
+*----------------------------------------------------------------------------*
 *How do the models compare? (linear vs probit)
 twoway (scatter EDUCBA_probit_hat ASVABC) ///
        (scatter EDUCBA_hat ASVABC) ///
@@ -145,55 +147,36 @@ di r(mean)^0.5
 qui summarize sqerror_probit
 di r(mean)^0.5
 
-*--------------------------------------------------
-*Cenosred data and the Tobit model
-*--------------------------------------------------
+* In HA 1 you need to calculate RMSE for five random observations:
 
-*Censored Data Generation (Monte Carlo Method):
-clear all
-set obs 50
-gen X=_n+10
-gen U=rnormal(0,10)
-gen Ystar=-40+1.2*X+U
-gen Y= Ystar*(Ystar>0)
+*We are going to take a random sub-sample. To make results replicable, I want 
+*to always make the exact same random draw. To achieve that, I will set a seed
+* so that the "random" number generator always begins with the same draw.
 
-scatter Y X if Y>0 || lfit Y X if Y>0|| lfit Ystar X, ///
-legend(label(1 "Y")  ///
-label(2 "Truncated Regression")  ///
-label(3 "True Regression Relationship") )
+set seed 01010101
 
-regress Y X if Y>0
+*We make random draws from a uniform distribution (0,1) to assign to each 
+*observation
+generate rand_draw = runiform()
 
-*the truncated regression slope is biased (slide 77)
-*one soltion is Tobit model
-*ll() argument isleft-censoring limit i.e. 
-* We only observe Y_i > 0 in this regression. 
-tobit Y X, ll(0)  robust
+*We will sort our observations from smallest to largest and take the first "n"
+*. This is how I randomize our sample of size "n", in this case n=5. That is, 
+*I randomly assign the number one to some observations. 
 
+sort rand_draw
+generate subsample1 = _n <= 5
 
-*--------------------------------------------------
-* presentation: exporting tables
-*--------------------------------------------------
-/*
-*use estout to generate nice tables
-ssc install estout, replace
+*Now we can call caluclate the rmse for the subsample of five observations
 
-*To create nice LATEX/Doc tables we can use this command
-*If you do not want/need Latex output, just erase the commands.
-eststo clear
-eststo model_l: quietly regress EDUCBA  ASVABC, robust 
-eststo model_p: quietly probit EDUCBA  ASVABC, robust 
+qui summarize sqerror if subsample1==1
+di r(mean)^0.5
 
-esttab model_l
+qui summarize sqerror_probit if subsample1==1
+di r(mean)^0.5
 
+*----------------------------------------------------------------------------*
+*----------------------------------------------------------------------------*
 
-esttab model_l using graphs/model_l.rtf, replace ///
-se onecell width(\hsize) ///
-addnote() ///
-label title(Estimation Result of Linear Model)
-*/
-*--------------------------------------------------
- 
 log close // Close the log, end the file
 
 global path "C:\Users\mahdi\are256b-w24"

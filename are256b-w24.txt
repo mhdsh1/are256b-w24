@@ -1,4 +1,9 @@
-### Week  1 
+ideas:
 
-adding some instruction on latex? 
+- adding some instruction on latex? 
+
+- adding r equivalent codes to slides
+
+
+
 
