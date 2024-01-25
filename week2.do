@@ -27,7 +27,6 @@ capture log close       // Close existing log files
 log using week2,replace         // Open log file
 *--------------------------------------------------
 
-
 *open a .dta (Stata) file
 *we use clear to reaplce the new dataset with the former one
 use "data\EAWE01.dta", clear 
@@ -35,6 +34,7 @@ use "data\EAWE01.dta", clear
 *----------------------------------------------------------------------------*
 * section 1: linear model
 *----------------------------------------------------------------------------*
+
 *let us work with some linear probability models
 *P(Y_i=1|X_i) = \beta X_i + \epsilon_i 
 *Prob of finishing a bachelor's degree vs composite cognitive ability test
@@ -126,8 +126,9 @@ browse EDUCBA EDUCBA_hat EDUCBA_probit_hat
 twoway (scatter EDUCBA_probit_hat ASVABC)
 
 *----------------------------------------------------------------------------*
-* section 4: model comparison based on rmse
+* section 4: model comparison based on rmse 
 *----------------------------------------------------------------------------*
+
 *How do the models compare? (linear vs probit)
 twoway (scatter EDUCBA_probit_hat ASVABC) ///
        (scatter EDUCBA_hat ASVABC) ///
@@ -146,6 +147,11 @@ di r(mean)^0.5
 
 qui summarize sqerror_probit
 di r(mean)^0.5
+
+* taking a random subsample *
+
+
+*Check https://www.stata.com/support/faqs/statistics/random-samples/ for the procedure
 
 * In HA 1 you need to calculate RMSE for five random observations:
 
@@ -173,6 +179,7 @@ di r(mean)^0.5
 
 qui summarize sqerror_probit if subsample1==1
 di r(mean)^0.5
+
 
 *----------------------------------------------------------------------------*
 *----------------------------------------------------------------------------*
