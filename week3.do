@@ -61,6 +61,10 @@ legend(
     label(2 "Truncated Regression") /// 
     label(3 "True Regression Relationship") )
 
+graph export graphs/censored.png, replace
+
+// help export graph 
+
 regress Y X if Y>0
 
 tobit Y X, ll(0)  robust
