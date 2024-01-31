@@ -159,7 +159,7 @@ di r(mean)^0.5
 *to always make the exact same random draw. To achieve that, I will set a seed
 * so that the "random" number generator always begins with the same draw.
 
-set seed 01010101
+set seed 2024
 
 *We make random draws from a uniform distribution (0,1) to assign to each 
 *observation
@@ -170,14 +170,18 @@ generate rand_draw = runiform()
 *I randomly assign the number one to some observations. 
 
 sort rand_draw
-generate subsample1 = _n <= 5
+
+// the first five observations are chosen to be in our subsample
+generate chosen = _n <= 5
+
+browse rand_draw 
 
 *Now we can call caluclate the rmse for the subsample of five observations
 
-qui summarize sqerror if subsample1==1
+qui summarize sqerror if chosen==1
 di r(mean)^0.5
 
-qui summarize sqerror_probit if subsample1==1
+qui summarize sqerror_probit if chosen==1
 di r(mean)^0.5
 
 

@@ -125,11 +125,12 @@ eststo model_p: quietly probit EDUCBA  ASVABC, robust
 
 esttab model_l
 
-
 esttab model_l using graphs/model_l.rtf, replace ///
 se onecell width(\hsize) ///
 addnote() ///
 label title(Estimation Result of Linear Model)
+%label title(Regression DD Estimates of MLDA effects on death rates (Replication of Table 5.2 of AP2014) \label{tab::52})
+
 
 *----------------------------------------------------------------------------*
 * Bonus: Drawing CDFs and PDFs
