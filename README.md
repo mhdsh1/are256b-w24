@@ -17,11 +17,12 @@ ARE 256B Winter 2024 TA Sections
 
 ## Links
 
-- [\Example .do file\](https://github.com/mhdsh1/are256b-w24/blob/main/example.do)
-- [\Example .tex file\](https://github.com/mhdsh1/are256b-w24/blob/main/example.tex)
-- [\Stata Visual overview for creating graphs\](https://www.stata.com/support/faqs/graphics/gph/stata-graphs/)
-- [\Exporting regression tables using estout\](https://repec.sowi.unibe.ch/stata/estout/index.html)
-- [\LaTeX in 30 Minutes\](https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes)
+- [Example .do file](https://github.com/mhdsh1/are256b-w24/blob/main/example.do)
+- [Example .tex file](https://github.com/mhdsh1/are256b-w24/blob/main/example.tex)
+- [Stata Visual overview for creating graphs](https://www.stata.com/support/faqs/graphics/gph/stata-graphs/)
+- [Exporting regression tables using estout](https://repec.sowi.unibe.ch/stata/estout/index.html)
+- [LaTeX in 30 Minutes](https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes)
+
 
 ## Calendar
 
