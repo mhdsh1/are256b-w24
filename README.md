@@ -17,36 +17,24 @@ ARE 256B Winter 2024 TA Sections
 
 ## Links
 
-- \href{https://github.com/mhdsh1/are256b-w24/blob/main/example.do}{Example .do file} 
-- \href{https://github.com/mhdsh1/are256b-w24/blob/main/example.tex}{Example .tex file}
-- \href{https://www.stata.com/support/faqs/graphics/gph/stata-graphs/}{Stata Visual overview for creating graphs}
-- \href{https://repec.sowi.unibe.ch/stata/estout/index.html}{exporting regression tables using estout}
-- \href{https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes}{\LaTeX in 30 Minutes}
+- [\Example .do file\](https://github.com/mhdsh1/are256b-w24/blob/main/example.do)
+- [\Example .tex file\](https://github.com/mhdsh1/are256b-w24/blob/main/example.tex)
+- [\Stata Visual overview for creating graphs\](https://www.stata.com/support/faqs/graphics/gph/stata-graphs/)
+- [\Exporting regression tables using estout\](https://repec.sowi.unibe.ch/stata/estout/index.html)
+- [\LaTeX in 30 Minutes\](https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes)
 
-# Calendar
+## Calendar
 
-## Week 1 - Jan 12
-
-## Week 2 - Jan 19
-
-## Week 3 -- Jan 26
-
-HW1 due Jan 28
-
-## Week 4 - Feb 2 -- MT REVIEW
-
-MT on Wednesday Feb 7
-
-## Week 5 - Feb 9
-
-HW2 due Feb 11
-
-## Week 6 - Feb 16
-
-## Week 7 - Feb 23
-
-## Week 8 - Mar 2
-
-## Week 9 - Mar 9
-
-## Week 10 - Mar 16 ??
++ Week 1 - Jan 12
++ Week 2 - Jan 19
++ Week 3 -- Jan 26
+  + HW1 due Jan 28
++ Week 4 - Feb 2 -- MT REVIEW
+  + MT on Wednesday Feb 7
++ Week 5 - Feb 9
+  + HW2 due Feb 11
++ Week 6 - Feb 16
++ Week 7 - Feb 23
++ Week 8 - Mar 2
++ Week 9 - Mar 9
++ Week 10 - Mar 16 ??
