@@ -23,7 +23,7 @@ ARE 256B Winter 2024 TA Sections
 - \href{https://repec.sowi.unibe.ch/stata/estout/index.html}{exporting regression tables using estout}
 - \href{https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes}{\LaTeX in 30 Minutes}
 
-# Calender
+# Calendar
 
 ## Week 1 - Jan 12
 
