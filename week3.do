@@ -1,4 +1,4 @@
-*--------------------------------------------------
+*----------------------------------------------------------------------------*
 *ARE 256B W24 -- SECTION 3
 *week3.do
 *1/26/2024
@@ -9,15 +9,15 @@
 * models based on rmse is reviewed. Also, there is a discussion of how to make
 * logfiles, exporting graphs, and outputting regression tables with estout 
 * package. 
-*--------------------------------------------------
+*----------------------------------------------------------------------------*
 
 *set working directory 
 global path "C:\Users\mahdi\are256b-w24"
 cd $path
 
-*--------------------------------------------------
+*----------------------------------------------------------------------------*
 *Program Setup
-*--------------------------------------------------
+*----------------------------------------------------------------------------*
 version 14              // Set Version number for backward compatibility
 set more off            // Disable partitioned output
 clear all               // Start with a clean slate
@@ -53,8 +53,6 @@ gen Y= Ystar*(Ystar>0)
 // gen Y= Ystar
 // replace Y = 0 if Ystar <= 0
 
-
-
 scatter Y X if Y>0 || lfit Y X if Y>0|| lfit Ystar X, ///
 legend(
     label(1 "Y")  ///
@@ -63,13 +61,13 @@ legend(
 
 graph export graphs/censored.png, replace
 
-// help export graph 
+// try help export graph 
 
 regress Y X if Y>0
 
 tobit Y X, ll(0)  robust
 
-// check help tobit
+// try help tobit
 
 *vce represents variance-covariance matrix of the estimators
 tobit Y X, ll(0)  vce(robust)
@@ -79,10 +77,8 @@ tobit Y X, ll(0)  vce(robust)
 *----------------------------------------------------------------------------*
 
 use "http://fmwww.bc.edu/ec-p/data/wooldridge/mroz.dta", clear
-* more info on data http://fmwww.bc.edu/ec-p/data/wooldridge/mroz.des
+// more info on data http://fmwww.bc.edu/ec-p/data/wooldridge/mroz.des
 gen exper2=exper^2
-
-browse
 
 *We want to understand the effect of education and experience on wage
 * but we only observe earning for EMPLOYED individuals.
@@ -91,7 +87,9 @@ browse
 *We suppose B is explained by the total income of hh, age, and number of kids.  
 *... and probably they have negative effect on someoene being employed
 
+*----------------------------------*
 *method 1: Heckman two stage model
+*----------------------------------*
 
 *stage 1: finding the probit model 
 gen B=1
@@ -99,15 +97,17 @@ replace B=0 if lwage==.
 * modeling employment status
 probit B nwifeinc age kidslt6 kidsge6
 
-
+* stage 1.5:
 gen z=_b[nwifeinc]*nwifeinc+_b[age]*age+_b[kidslt6]*kidslt6 +_b[kidsge6]*kidsge6 + _b[_cons]
 gen lambda_hat=normalden(z)/normal(z)
 
 *stage 2: 
 reg lwage educ exper exper2 lambda_hat
 
-
+*------------------------------------------------*
 *method 2: using heckman command (ML Estimation)
+*------------------------------------------------*
+
 heckman lwage educ exper exper2, select(nwifeinc age kidslt6 kidsge6)
 
 *----------------------------------------------------------------------------*
@@ -131,7 +131,6 @@ addnote() ///
 label title(Estimation Result of Linear Model)
 %label title(Regression DD Estimates of MLDA effects on death rates (Replication of Table 5.2 of AP2014) \label{tab::52})
 
-
 *----------------------------------------------------------------------------*
 * Bonus: Drawing CDFs and PDFs
 *----------------------------------------------------------------------------*
@@ -153,8 +152,6 @@ gen Z_pdf_logit=exp(-Z)/(1+exp(-Z))^2
 gen Z_pdf_probit=normalden(Z)
 sort Z
 line Z_pdf_logit Z||line Z_pdf_probit Z
-
-
 
 *----------------------------------------------------------------------------*
 *----------------------------------------------------------------------------*
