@@ -1,7 +1,7 @@
 *----------------------------------------------------------------------------*-
 *ARE 256b W23 -- Section 4
 *week4.do
-*Feb/02/2024
+*Feb/09/2024
 *Mahdi Shams (mashams@ucdavis.edu)
 *Based on Bulat Gafarov's Slides, and previous work by Armando Rangel Colina &
 * Zhiran Qin.
@@ -11,6 +11,10 @@
 * these concepts in Stata to replicate the RD and D-in-D results from 
 * "Mastering Metrics".
 *----------------------------------------------------------------------------*
+
+*set working directory 
+global path = "C:\Users\mahdi\are256b-w24"
+cd $path
 
 *----------------------------------------------------------------------------*
 *Program Setup
@@ -23,10 +27,6 @@ macro drop _all         // clear all macros
 capture log close       // Close existing log files
 log using week4, replace // Open log file
 *----------------------------------------------------------------------------*
-
-*set working directory 
-global path = "C:\Users\mahdi\are256b-w24"
-cd $path
 
 *----------------------------------------------------------------------------*
 * Section 1: Local Macros
@@ -168,21 +168,15 @@ forvalues i = 0/1 {
 * Bonus: Replication of Table 4.1 of Mastering Metrics
 *----------------------------------------------------------------------------*
 
-//this is the package that we need in order to 
-// send regression results we get in each loop to excel and append them together
-*new package install
-*ssc install outreg2
-
 clear all
 
 use "$path\data\AEJfigs_MM_RD", clear
 
-* columns 1 and 3 is the model 4.2 AP2014
-// you only use control for age
-* columns 2 and 4 is the model 4.4 AP2014
-// you control for age, age_sq, and their interaction with the dummy variable
+* columns 1 and 3 is the model 4.2 AP2014 -- you only use control for age
+* columns 2 and 4 is the model 4.4 AP2014 -- you control for age, age_sq, and 
+* ... their interaction with the dummy variable
 
-* generate an over>21 dummy
+* generate an over-21 dummy
 gen D = (agecell>21)
 * generate control variables
 gen age = agecell - 21
@@ -190,6 +184,65 @@ gen age_sq = age^2
 gen age_D = age*D
 gen age_sq_D = age_sq*D
 
+matrix A = J(8,8,0)
+matrix rownames A = all mva suicide homicide externalother internal alcohol Sample_Size
+matrix colnames A = 1 se 2 se 3 se 4 se
+
+* define a variable list and loop over all dependent variables in var_list 
+* we have 4 different regressions for each dep. variable in varlist
+* note that when using local, you should run the code all together,
+
+local var_list all mva suicide homicide externalother internal alcohol
+loc count = 1
+foreach i of local var_list {
+
+	* regressions for column (1)
+	qui reg `i' D age, robust
+	mat A[`count',1] = _b[D]
+	mat A[`count',2] = _se[D]
+	mat A[8, 1] = e(N)
+	mat A[8, 2] = .
+	if `i' == all predict all_hat
+
+	* regressions for column (2)
+	//exercise
+
+	* regressions for column (3)
+	qui reg `i' D age if inrange(agecell, 20 , 22), robust
+	mat A[`count',5] = _b[D]
+	mat A[`count',6] = _se[D]
+	mat A[8, 5] = e(N)
+	mat A[8, 6] = .
+
+	* regressions for column (4)
+	// exercise
+
+	loc ++count
+	dis `count'
+}
+
+* let's look at the output: 
+matlist A
+
+* and let's make a letex table output form the matrix:
+esttab matrix(A, fmt(2)) using graphs/Tab41.tex, replace nomtitles sfmt(%5.2f) ///
+width(\hsize) ///
+addnote("Samples in columns 1 and 2 regressions have between 19 and 22 years." ///
+"samples in coulmns 3 and 4 have between 20 and 21 years old." ///
+"Columns 1 and 3 report the results of regressing dependent variable on age." ///
+"columns 2 and 4 report results of regressing dependent variable on age, age-squared" ///
+"with their interactions with the over-21 dummy.") ///
+label title(Sharp RD estimates of MLDA effects on mortality ///
+(Replication of Table 4.1 of AP2014) \label{tab::41})
+
+
+*---------------------------------------------------------*
+* an alternative way to replicate using outreg2 in stata  *
+*---------------------------------------------------------*
+
+* this is the package that we need in order to send regression results we get in
+* ... each loop to excel and append them together:
+ssc install outreg2
 
 * define a variable list, dependent variables: "all deaths", 
 * ... "motor vehicle accidents releted deaths", ...
@@ -225,78 +278,6 @@ outreg2  using "$path\outputs\rd.xls", keep(D) dec(3) bdec(3)tdec(3) rdec(3) alp
 loc ++count
 dis `count'
 }
-
-
-
-/*alpha(numlist) specifies the levels of significance, separated by comma
-        from the most significant to the least signficiant. Example:
-        alpha(0.001, 0.01, 0.05). Up to 3 are automatically assigned
-        asterisks. If more than 3 levels are defined, then the symbols must be
-        specified with symbol(text).
-In many cases the size and level of a test are equal.
-*/
-
-
-* plot Figure 4.2
-scatter all agecell, xline(21, lpattern(dash) lcolor(gray))
-
-*---------------------------------------------------------*
-* an alternative way to replicate using matrices in stata *
-*---------------------------------------------------------*
-
-
-* Replicate table 4.1
-* generate an over-21 dummy
-gen D = (agecell>21)
-* generate control variables
-gen age = agecell - 21
-gen age_sq = age^2
-gen age_D = age*D
-gen age_sq_D = age_sq*D
-* define a variable list
-local var_list all mva suicide homicide externalother internal alcohol
-* Only replace the Excel file the first time is run
-loc count = 1
-loc first_step = "replace"
-
-matrix A = J(8,8,0)
-matrix rownames A = all mva suicide homicide externalother internal alcohol Sample_Size
-matrix colnames A = 1 se 2 se 3 se 4 se
-
-*Loop over in var_list (4 different regressions for each dep. variable in varlist) 
-foreach i of local var_list {
-if `count' != 0 loc first_step = "append"
-* regressions for column (1)
-qui reg `i' D age, robust
-if `i' == all predict all_hat
-// compare to:
-//  outreg2  using "graphs/Results.xls", dec(3) bdec(3)tdec(3) rdec(3) alpha(.01, .05, .1) `first_step'
-mat A[`count',1] = _b[D]
-mat A[`count',2] = _se[D]
-mat A[8, 1] = e(N)
-mat A[8, 2] = .
-
-* regressions for column (2)
-//exercise
-
-* regressions for column (3)
-// exercise
-
-* regressions for column (4)
-// exercise
-
-loc ++count
-dis `count'
-}
-
-esttab matrix(A, fmt(2)) using graphs/41.tex, replace nomtitles sfmt(%5.2f) ///
-width(\hsize) ///
-addnote("Samples in columns 1 and 2 regressions have between 19 and 22 years." ///
-"samples in coulmns 3 and 4 have between 20 and 21 years old." ///
-"Columns 1 and 3 report the results of regressing dependent variable on age." ///
-"columns 2 and 4 report results of regressing dependent variable on age, age-squared" ///
-"with their interactions with the over-21 dummy.") ///
-label title(Sharp RD estimates of MLDA effects on mortality (Replication of Table 4.1 of AP2014) \label{tab::41})
 
 
 *----------------------------------------------------------------------------*
