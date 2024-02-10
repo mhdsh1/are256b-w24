@@ -32,7 +32,7 @@ log using week4, replace // Open log file
 * Section 1: Local Macros
 *----------------------------------------------------------------------------*
 
-use auto
+use data\auto
 
 /* Local macros are somewhat like variables in programming languages.
 They are "boxes" where you can store things and pull them our later. 
@@ -49,9 +49,12 @@ local x 1
 //is the same as:
 local x=1
 
-local x 2+2
-display `x'
-display "`x'"
+display x
+summ make
+
+local y 2+2
+display `y'
+display "`y'"
 
 
 local x -2
@@ -85,6 +88,8 @@ command 10 or more variables that could not be represented in shorthand.*/
 /*if you had a big list of control variables that you used constantly,
 you could define the list as a a macro called controls. Then instead of:*/
 
+// these three regression are going to yield same result: 
+
 regress mpg trunk weight length
 
 local apple trunk weight length
@@ -93,6 +98,10 @@ regress mpg `apple'
 local varlist "trunk weight length"
 regress mpg `varlist'
 
+// local has a short memory
+local a = 2
+
+di `a'
 
 *----------------------------------------------------------------------------*
 * Section 2: Loops in Stata
@@ -179,7 +188,7 @@ use "$path\data\AEJfigs_MM_RD", clear
 * generate an over-21 dummy
 gen D = (agecell>21)
 * generate control variables
-gen age = agecell - 21
+gen age = agecell - 21 // a - a_0
 gen age_sq = age^2
 gen age_D = age*D
 gen age_sq_D = age_sq*D
@@ -200,7 +209,7 @@ foreach i of local var_list {
 	qui reg `i' D age, robust
 	mat A[`count',1] = _b[D]
 	mat A[`count',2] = _se[D]
-	mat A[8, 1] = e(N)
+	mat A[8, 1] = e(N) // e(N) gives the sample size
 	mat A[8, 2] = .
 	if `i' == all predict all_hat
 
@@ -303,17 +312,14 @@ reg mrate legal i.year i.state ///
 if dtype == 1 & inrange(year,1970,1983) & agegr ==2, vce(cluster state)
 
 * Col 2
-reg mrate legal i.year i.state t_* ///
-if dtype == 1 & inrange(year,1970,1983) & agegr ==2, vce(cluster state)
+//exercise 
 
 * Col 3
 reg mrate legal i.year i.state [w = pop] ///
 if dtype == 1 & inrange(year,1970,1983) & agegr ==2, vce(cluster state)
 
 * Col 4 for dtype == 1 (i.e., all death)
-reg mrate legal i.year i.state t_* [w = pop] ///
-if dtype == 1 & inrange(year,1970,1983) & agegr ==2, vce(cluster state)
-
+// exercise
 
 *==============================================================================
 
