@@ -1,5 +1,5 @@
 *----------------------------------------------------------------------------*-
-*ARE 256b W23 -- Section 4
+*ARE 256b W24 -- Week 4
 *week4.do
 *Feb/09/2024
 *Mahdi Shams (mashams@ucdavis.edu)

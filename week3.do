@@ -39,7 +39,7 @@ gen X=_n+10
 browse
 * now we generate the error term assuming normal distribution
 * it's good to set seed before generating any random var
-set seed 2023
+set seed 2024
 gen U=rnormal(0,10)
 
 browse

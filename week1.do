@@ -16,7 +16,7 @@ clear all
 set more off
 
 *change working directory (use asterix to comment)
-global path "C:\Users\mahdi\are256b-w23"
+global path "C:\Users\mahdi\are256b-W24"
 cd $path
 
 *How to open a .xlsx file
@@ -67,7 +67,7 @@ browse ASVABAR EDUCMAST MALE if EDUCMAST==1&MALE==1
 
 
 *Create a new variable
-gen age_today = 2023-BYEAR
+gen age_today = 2024-BYEAR
 browse age_today
 
 *using functions: log()

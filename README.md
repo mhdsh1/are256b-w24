@@ -36,6 +36,7 @@ ARE 256B Winter 2024 TA Sections
   + HW2 due Feb 11
 + Week 6 - Feb 16
 + Week 7 - Feb 23
+  + HW3 due Feb 24
 + Week 8 - Mar 2
 + Week 9 - Mar 9
-+ Week 10 - Mar 16 ??
++ Week 10 - Mar 15 ??
