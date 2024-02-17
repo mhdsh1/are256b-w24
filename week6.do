@@ -30,6 +30,8 @@ cd $path
 *Generate White noise, MA(1), AR(1) processes using the codes from the slides. 
 *Make *autocorrelation plots  for T=100 and 1000 to illustrate consistency.
 
+browse 
+
 clear all
 set more off
 
@@ -37,55 +39,83 @@ set obs 1050
 
 gen t=[_n]
 
-tsset t
+tsset t // we use this to declare time periods to stata, try help tsset.
 
-*White Noise
+* Let's create the White Noise First. 
+* white noise is the buidling block of time series.
+
 gen e=rnormal() 
 
-*Plot the constructed time series
-tsline e if t<100
+// here we create the WN,by creating using random normal distribution ... 
+// ... this is white noise beacuase (slide 9): 
+// (1) the mean is zero and constant 
+// (2) the variance is not changing over time
+// (3) and ac is 0 for any lag larger than 0
+
+tsline e if t<100 //Plot the constructed time series
 
 *Create an autocorrelogram (95% confidence interval by default)
 ac e
-*90% Confidence interval
-ac e, level(90)
-*T=1000 (40 lags by default)
-ac e,lags(1000)
+// autocorrelogram gives the function of autocorrelation function (slide 8) ...
+// ... as function of lags (\tau in lecture)
+// We observe that the ac for the white noise is always 0 for all the lags
 
 
-*MA1
 
+* Let's create the MA1 process
+// we are going to make the same process as we have on slide 10
+
+* first thing to do is to create the lag of e:
 gen elag=e[_n-1]
 
+* and now we have MA(1)
 gen yma=0.25+e+elag*.5
-tsline yma if t<100
-ac yma
-*T=1000
-ac yma,lags(1000)
+
+tsline yma if t<100 // plot the MA(1)
+
+ac yma // plot the autocorrelation
 
 
-*AR1
-gen yar=e in 1
+
+* Let's create the AR1 process
+
+gen yar=0.25+e in 1 // we create the y_1 first, assuming y_0 is 0: 
 
 replace yar=0.25+0.9*yar[_n-1]+e in 2/1050
+// and then create the following values
+
 tsline yar
 ac yar
-*T=1000
 ac yar,lags(500)
 
-*AR1 with diff para  
+*AR1 with diff parameters  
 *Plot AR(1) process with rho = 0, 0.4, 0.9 for T=100.
 
 *rho=0
 gen yar_00=e in 1
 replace yar_00=0.25+0*yar_00[_n-1]+e in 2/1050
+
 *rho=0.4
 gen yar_04=e in 1
 replace yar_04=0.25+0.4*yar_04[_n-1]+e in 2/1050
-*rho=0.9
-gen yar_09=yar
 
-tsline yar_00 yar_04 yar_09
+*rho=0.6
+gen yar_06=e in 1
+replace yar_06=0.25+0.25*yar_06[_n-1]+e in 2/1050
+
+
+*rho=0.9
+gen yar_09=e in 1
+replace yar_09=0.25+0.9*yar_09[_n-1]+e in 2/1050
+
+tsline yar_00 yar_025 yar_04 yar_09
+
+* compate the autocorrelograms:
+ac yar_00 
+ac yar_04 
+ac yar_06
+ac yar_09
+
 
 *--------------------------------------------------
 * Bonus 1:  S&P 500  
@@ -97,7 +127,7 @@ tsline yar_00 yar_04 yar_09
 *Make a plot of the time series  and autocorrelation. 
 *It should be like white noise, i.e. no autocorrelation.
 
-import excel "data/SP500.xls", firstrow clear 
+import excel "data\SP500.xls", firstrow clear 
 
 destring SP500, replace
 
@@ -128,10 +158,11 @@ ac dSP500, lag(100)
 *--------------------------------------------------
 
 *Download CPI monthly  inflation (both index, Y,  and percentage changes, d log Y)  
-*1970-2022 https://fred.stlouisfed.org/series/CPILFESL . 
-*Note that Index is trending upwards, but after doing percentage changes, it wiggles around the mean.
+*1970-2022 https://fred.stlouisfed.org/series/CPIAUCSL . 
+*Note that Index is trending upwards, but after doing percentage changes ... 
+* ... it wiggles around the mean.
 
-import delimited "/Users/c/Documents/Stata/256B2022/Discussion6/CPILFESL.csv",clear
+import delimited "data\CPIAUCSL.csv",clear
 
 *time format
 generate date1 = date(DATE, "YMD")
@@ -157,7 +188,6 @@ ac logy, lags(200)
 sum dlogy
 ac dlogy, lag(70)
 
-
 *Compute differences in CPI percentage changes, dd log Y, make TS plot. How many AC lags are statistically for dd log Y ?
 
 gen ddlogy = dlogy - dlogy[_n-1]
@@ -172,9 +202,10 @@ ac dy
 gen ddy = dy - dy[_n-1]	
 tsline ddy
 ac ddy
-			*For an insight of why we would want a stationary process, please check
-			*your textbook and
-			* https://www.tylervigen.com/spurious-correlations
+
+// For an insight of why we would want a stationary process, please check
+// your textbook and
+// https://www.tylervigen.com/spurious-correlations
 
 *===========================================================
 log close 
