@@ -70,7 +70,8 @@ tsline p if  yr == 2000
 
 *Now let's find the average price for each month:
 
-*One way we can do it is by regressing price (p) on the dummy variable for each month (D_month).
+*One way we can do it is by regressing price (p) on the dummy variable for each 
+* month (D_month).
 
 *model 1: p = \beta_jan*D_jan + \beta_feb*D_feb + ... + \beta_dec*D_dec + e
 *where D_feb is 1 if month == feb and 0 otherwise
@@ -78,7 +79,8 @@ tsline p if  yr == 2000
 *or if we have a constant in the regression:
 *model 2: p = \beta_0 + \beta_feb*D_feb + ... + \beta_dec*D_dec + e
 
-*let's see, as an example, what would be the average price in september, based on model 2:
+*let's see, as an example, what would be the average price in september, 
+* based on model 2:
 * E(p|month=sep) = \beta_0 + \beta_feb*0+ ...+\b_sep*1+ \beta_oct*0 + ...
 * E(p|month=sep) = \beta_0 + \b_sep
 
@@ -115,7 +117,8 @@ reg p L(1).seasonal, robust
 reg p seasonal lseasonal, robust
 reg p L(0/1).seasonal, robust
 
-*So in order to regress price on sesonal and its lags (model 2) I can do the regression:
+*So in order to regress price on sesonal and its lags (model 2) one can do 
+* the regression:
 reg p L(0/10).seasonal,robust 
 
 *notice that here the L0 coefficient is for Jan, L1 is for Feb, ..., and L10 for Nov.
@@ -125,7 +128,7 @@ reg p L(0/10).seasonal,robust
 * E(p|month=sep) = constant + \b_L8
 
 
-*Ypu can also directly calculate the means, ny making model without constant
+*Ypu can also directly calculate the means, by making model without constant
 reg p L(0/11).seasonal, nocons robust
 
 
@@ -151,7 +154,7 @@ predict resid, residuals
 // do we have autocorrelations? 
 ac resid
 
-*iii) Generate the lagged residual.
+*iii) Generate the lagged residual
 gen resid_lag1 = resid[_n-1]
 
 *iv)Perform the auxiliary regression of the residual on its own lag and the regressor grres.
@@ -210,7 +213,10 @@ estat bgodfrey, lags(20)
 * Section 3: Correcting for Serial Correlation
 *--------------------------------------------------
 
-*compute the T (or the p?) you need
+*compute the p you need
+*for large sample, we can use p = 0.75*T^(1/3)
+* scalar p = floor(0.75*e(N)^(1/3))
+
 reg p x, robust
 newey p x, lag(6) force
 
@@ -218,8 +224,6 @@ newey p x, lag(6) force
 reg L(0/26).p 
 estat bgodfrey, lags(26)
 
-*for large sample, we can use p = 0.75*T^(1/3)
-* scalar p = floor(0.75*e(N)^(1/3))
 
 *===========================================================
 log close 
