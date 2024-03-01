@@ -180,35 +180,43 @@ sample.
 \begin{frame}{Week 8}
 %----------------------------------------------------------------------------%
 
-Pooled OLS
+
+\textbf{Pooled OLS}
 
 $$
-Y_it = \beta_0 + \beta X_{it} + u_{it}
+Y_it = \beta_0 + \beta_1 X_{it} + e_{it}
 $$
 
 for causal interpretation we need exogeneity
-$\mathbb{E}[u_{it}|X_{it}]=0$
-
-This rules out that $W_i$, $W_t$, or $W_{it}$ exist.
-
-FE model with State + time fixed effects
 
 $$
-Y_{it} = \beta_0 + \beta_1 X_{1it} + \beta_2 X_{2it} + \dots + \beta_k X_{kit}
- + \alpha_i + \lambda_t + u_{it}
+\mathbb{E}[e_{it}|X_{it}]=0
 $$
 
+This rules out that $W_i$, $W_t$ (national trend), or $W_{it}$ (state-specific
+trend) exist.
 
-FE Model with State FEs + time FEs + State-level time trends
+\textbf{FE model with State + time fixed effects}
 
 $$
-Y_{it} = \beta_0 + \beta_1 X_{1it} + \beta_2 X_{2it} + \dots + \beta_k X_{kit}
- + \alpha_i + \lambda_t + \gamma_i t + u_{it}
+Y_{it} = \beta_0 + \beta_1 X_{it} + u_i + \lambda_t + v_{it}
 $$
 
-We are not controlling for any omitted var that is changing over time. That is 
-if we believe that there exist an omitted variable that is changing over time
-we can not have causal interpretation for the $\beta$.
+for causal interpretation we need exogeneity
+
+$$
+\mathbb{E}[v_{it}|X_{it}, u_i, \lambda_t ]=0
+$$
+
+This rules out that $W_{it}$ exists. That is as long as any all the omitted 
+variables are state-invariant, or time-invariant we are good. 
+
+
+\textbf{FE Model with State FEs + time FEs + State-level time trends}
+
+$$
+Y_{it} = \beta_0 + \beta_1 X_{it} + u_i + \lambda_t + \gamma_i t + v_{it}
+$$
 
 
 \end{frame}

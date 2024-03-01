@@ -1,7 +1,7 @@
 *--------------------------------------------------
 *ARE 256b W24 -- Week 8
-*weekXm1.do
-*Feb/29/2024
+*week8.do
+*Mar/1/2024
 *Mahdi Shams (mashams@ucdavis.edu)
 *Based on Bulat's Slides, and previous work by Armando Rangel Colina & Zhiran Qin
 *This code is prepared for the week 8 of ARE 256B TA Sections. 
@@ -109,45 +109,6 @@ clear
 * we can reject H0 if p < α.
 
 
-
-
-*--------------------------------------------------
-* Section Time Trend
-*--------------------------------------------------
-/*
-*use S&P 500 index data
-
-tsline sp500
-
-*Only check data before the pandemic
-*till Feb 14th, 2020
-*keep if date1<21960
-
-*detrend
-reg log_sp500 date
-predict uhat, residuals
-tsline uhat
-ac uhat, lags(200)
-
-reg L(0/1).log_sp500 L(0/1).date
-predict yhat2
-tsline yhat2 
-
-
-//We skip this part
-/*
-*Breusch-Godfrey test
-reg log_sp500 date
-estat bgodfrey, lags(1)
-
-
-*Correction for AR(1) in u
-reg L(0/1).log_sp500 L(0/1).date
-predict uhat2, residuals
-ac uhat2
-estat bgodfrey, lags(1)
-*/
-*/
 *--------------------------------------------------
 * Section  Spurious Regression 
 *--------------------------------------------------
@@ -255,6 +216,4 @@ ac ddlogy, lag(500)
 
 
 
-
-*===========================================================
 log close 

@@ -139,7 +139,9 @@ reg p L(0/11).seasonal, nocons robust
 * Section 2: Breusch-Godfrey Test
 *--------------------------------------------------
 
-*--- Section 2_1: manual derivation
+*************************
+*** Coding BG test    ***
+*************************
 
 *for simplicity set x as white noise
 gen x = rnormal() 
@@ -160,21 +162,18 @@ gen resid_lag1 = resid[_n-1]
 *iv)Perform the auxiliary regression of the residual on its own lag and the regressor grres.
 *v) Compute the Breusch-Godfrey statistic using nR2 from the above regression.	
 
-// method 1 for procedure 1
 // for p = 1
 
 reg resid x  resid_lag
 esttab, se r2
 
-// method 2 for procedure 1
-// for p =1
+* this is equivalent:
 reg resid x L(1/1).resid
 esttab, se r2
 
 // for p=3
 reg resid x L(1/3).resid
-// number of observation
-di e(N)
+di e(N) // number of observation
 esttab, se r2
 
 // for p=5
@@ -183,8 +182,7 @@ di e(N)
 esttab, se r2
 
 
-
-// other method (not covered)
+* How to find the critical value?
 estadd scalar nR2 = e(N)*e(r2)
 estadd scalar pval = chi2tail(e(df_m) - 1, e(nR2))
 
@@ -197,7 +195,9 @@ In contrast, dis chi2tail(1,3.8414588) will return .05
 chisq test -- https://www.wikiwand.com/en/Chi-squared_test
 */
 
-*--- Section 2_2: procedure 2 using Stata command bgodfrey
+******************************
+*** Using bgodfrey command ***
+******************************
 
 reg resid x
 
@@ -221,9 +221,6 @@ scalar p = floor(0.75*e(N)^(1/3))
 reg p x, robust
 newey p x, lag(6) force
 
-
-reg L(0/26).p 
-estat bgodfrey, lags(26)
 
 
 *===========================================================

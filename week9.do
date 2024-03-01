@@ -1,7 +1,7 @@
 *--------------------------------------------------
-*ARE 256b W24 -- Week X
-*week8.do
-*Mar/1/2024
+*ARE 256b W24 -- Week 9
+*week9.do
+*Mar/8/2024
 *Mahdi Shams (mashams@ucdavis.edu)
 *Based on Bulat's Slides, and previous work by Armando Rangel Colina & Zhiran Qin
 *This code is prepared for the Week 9 of ARE 256B TA Sections. 
