@@ -1,10 +1,10 @@
 *--------------------------------------------------
-*ARE 256b W24 -- Week Xm1
+*ARE 256b W24 -- Week 8
 *weekXm1.do
 *Feb/29/2024
 *Mahdi Shams (mashams@ucdavis.edu)
 *Based on Bulat's Slides, and previous work by Armando Rangel Colina & Zhiran Qin
-*This code is prepared for the week 7 of ARE 256B TA Sections. 
+*This code is prepared for the week 8 of ARE 256B TA Sections. 
 *--------------------------------------------------
 
 *--------------------------------------------------
@@ -46,12 +46,6 @@ tsline sp500
 gen log_sp500 = log(sp500)
 tsline log_sp500
 
-*Only check data before the pandemic
-*till Feb 14th, 2020
-*keep if date<21960
-
-tsline log_sp500
-
 
 reg log_sp500 L1.log_sp500
 
@@ -60,10 +54,11 @@ reg log_sp500 L1.log_sp500
 * we should avoid doing this and do DF test instead
 * find the tstat
 *dis (1/se)*(rhoh -1) 
-dis (1/.0022345)*abs(.9972702  -0) 
+dis (1/.0022345)*abs(.9972702  -1) 
 
 // t-stat is smaller than 1.96 ... should we conclude that it is non-stationary?
-
+// no, because if the process is non-stationary the t-stat is not normally-
+// distributed anymore
 
 dfuller log_sp500, regress
 // we can not reject the null of non-stationarity with df-test
@@ -76,6 +71,7 @@ gen dlog_sp500 = log_sp500 - log_sp500[_n-1]
 tsline dlog_sp500
 
 ac dlog_sp500, lags(200)
+
 dfuller dlog_sp500, regress
 
 ****************
@@ -96,7 +92,7 @@ clear
 	*China's exchange rate vs USD
 		twoway (line apple_stock time_)	
 		
-		dfuller apple_stock
+		dfuller apple_stock, regress
 		
 		*Testing for an AR(2) process with drift
 		dfuller apple_stock, lags(2) drift
@@ -118,7 +114,7 @@ clear
 *--------------------------------------------------
 * Section Time Trend
 *--------------------------------------------------
-
+/*
 *use S&P 500 index data
 
 tsline sp500
@@ -135,7 +131,7 @@ ac uhat, lags(200)
 
 reg L(0/1).log_sp500 L(0/1).date
 predict yhat2
-tsline yhat2 log_sp500
+tsline yhat2 
 
 
 //We skip this part
@@ -151,7 +147,7 @@ predict uhat2, residuals
 ac uhat2
 estat bgodfrey, lags(1)
 */
-
+*/
 *--------------------------------------------------
 * Section  Spurious Regression 
 *--------------------------------------------------
@@ -253,8 +249,6 @@ ac ddlogy, lag(500)
 *For an insight of why we would want a stationary process, please check
 *your textbook and
 * https://www.tylervigen.com/spurious-correlations
-
-
 
 
 
