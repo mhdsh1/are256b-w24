@@ -56,10 +56,17 @@ tsline log_sp500
 reg log_sp500 L1.log_sp500
 
 
-*testing against rho=1
+*testing against rho=1 -- The Naive approach
+* we should avoid doing this and do DF test instead
 * find the tstat
 *dis (1/se)*(rhoh -1) 
+dis (1/.0022345)*abs(.9972702  -0) 
 
+// t-stat is smaller than 1.96 ... should we conclude that it is non-stationary?
+
+
+dfuller log_sp500, regress
+// we can not reject the null of non-stationarity with df-test
 
 *unit root
 * Dealing Nonstationary Time Series: Taming the Tiger
@@ -69,6 +76,43 @@ gen dlog_sp500 = log_sp500 - log_sp500[_n-1]
 tsline dlog_sp500
 
 ac dlog_sp500, lags(200)
+dfuller dlog_sp500, regress
+
+****************
+*** DF TEST ****
+****************
+
+clear
+	import excel "data/section_timeseries.xlsx", firstrow clear 
+
+	*For some reason there STATA is reading some missing data at the end, we'll just get rid of it
+	drop if date_ == "" 
+
+*Create a running variable.
+	generate time_ =[_n]
+*Tell STATA that the time structure is based on the variable called time_
+	tsset time_		
+	
+	*China's exchange rate vs USD
+		twoway (line apple_stock time_)	
+		
+		dfuller apple_stock
+		
+		*Testing for an AR(2) process with drift
+		dfuller apple_stock, lags(2) drift
+		
+		
+		*Data transformation to try and eliminate  non-stationarity
+		gen log_apple =  log(apple_stock)
+		gen d1_log_apple =  log_apple-log_apple[_n-1]
+		twoway (line d1_log_apple time_)	
+		dfuller d1_log_apple
+	
+* how to read the tests?
+* Instead of rejecting H0 at the significance level α if T > c, 
+* we can reject H0 if p < α.
+
+
 
 
 *--------------------------------------------------
@@ -94,7 +138,8 @@ predict yhat2
 tsline yhat2 log_sp500
 
 
-
+//We skip this part
+/*
 *Breusch-Godfrey test
 reg log_sp500 date
 estat bgodfrey, lags(1)
@@ -105,7 +150,7 @@ reg L(0/1).log_sp500 L(0/1).date
 predict uhat2, residuals
 ac uhat2
 estat bgodfrey, lags(1)
-
+*/
 
 *--------------------------------------------------
 * Section  Spurious Regression 
@@ -137,7 +182,7 @@ gen X = 1 + 0.8 * date + ex
 gen Y = 0.2 + 1.6 * date + ey
 
 reg Y X
-*alpha_y / alpha_x =2
+*comapare with alpha_y / alpha_x =2
 
 
 
@@ -208,9 +253,6 @@ ac ddlogy, lag(500)
 *For an insight of why we would want a stationary process, please check
 *your textbook and
 * https://www.tylervigen.com/spurious-correlations
-
-
-
 
 
 
