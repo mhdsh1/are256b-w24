@@ -1,0 +1,457 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\mahdi\are256b-W24\week7.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}29 Feb 2024, 18:01:16
+{txt}
+{com}. *--------------------------------------------------
+. 
+. *set working directory 
+. global path = "C:\Users\mahdi\are256b-W24"
+{txt}
+{com}. cd $path
+{res}C:\Users\mahdi\are256b-W24
+{txt}
+{com}. 
+. 
+. *--------------------------------------------------
+. * Section Random Walk
+. *--------------------------------------------------
+. 
+. *use S&P 500 index data
+. import excel "data/SP500.xls", firstrow clear 
+{res}{txt}
+{com}. 
+. 
+. rename DATE date
+{res}{txt}
+{com}. rename SP500 sp500
+{res}{txt}
+{com}. destring sp500, replace
+{txt}sp500 has all characters numeric; {res}replaced {txt}as {res}double
+{txt}(46 missing values generated)
+{res}{txt}
+{com}. 
+. *we use "format" to make date readable
+. format date %td
+{txt}
+{com}. tsset date
+{res}{txt}{col 9}time variable:  {res}{col 25}date, 23feb2018 to 23feb2023, but with gaps
+{txt}{col 17}delta:  {res}1 day
+{txt}
+{com}. 
+. 
+. tsline sp500
+{res}{txt}
+{com}. 
+. gen log_sp500 = log(sp500)
+{txt}(46 missing values generated)
+
+{com}. tsline log_sp500
+{res}{txt}
+{com}. 
+. *Only check data before the pandemic
+. *till Feb 14th, 2020
+. *keep if date<21960
+. 
+. tsline log_sp500
+{res}{txt}
+{com}. 
+. 
+. reg log_sp500 L1.log_sp500
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}       985
+{txt}{hline 13}{c +}{hline 34}   F(1, 983)       > {res} 99999.00
+{txt}       Model {c |} {res} 35.2322903         1  35.2322903   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} .173876397       983  .000176883   {txt}R-squared       ={res}    0.9951
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.9951
+{txt}       Total {c |} {res} 35.4061667       984  .035981877   {txt}Root MSE        =   {res}  .0133
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   log_sp500{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}log_sp500 {c |}
+{space 9}L1. {c |}{col 14}{res}{space 2} .9972702{col 26}{space 2} .0022345{col 37}{space 1}  446.30{col 46}{space 3}0.000{col 54}{space 4} .9928852{col 67}{space 3} 1.001655
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2}  .022716{col 26}{space 2} .0181932{col 37}{space 1}    1.25{col 46}{space 3}0.212{col 54}{space 4} -.012986{col 67}{space 3}  .058418
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. 
+. *testing against rho=1
+. * find the tstat
+. *dis (1/se)*(rhoh -1) 
+. 
+. 
+. *unit root
+. * Dealing Nonstationary Time Series: Taming the Tiger
+. *calculate daily returns/ first difference
+. 
+. gen dlog_sp500 = log_sp500 - log_sp500[_n-1]
+{txt}(93 missing values generated)
+
+{com}. tsline dlog_sp500
+{res}{txt}
+{com}. 
+. ac dlog_sp500, lags(200)
+{txt}(note: time series has 266 gaps)
+{res}{txt}
+{com}. 
+. 
+. *--------------------------------------------------
+. * Section Time Trend
+. *--------------------------------------------------
+. 
+. *use S&P 500 index data
+. 
+. tsline sp500
+{res}{txt}
+{com}. 
+. *Only check data before the pandemic
+. *till Feb 14th, 2020
+. *keep if date1<21960
+. 
+. *detrend
+. reg log_sp500 date
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     1,259
+{txt}{hline 13}{c +}{hline 34}   F(1, 1257)      = {res}  4036.11
+{txt}       Model {c |} {res} 34.6820623         1  34.6820623   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 10.8013271     1,257  .008592941   {txt}R-squared       ={res}    0.7625
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.7623
+{txt}       Total {c |} {res} 45.4833894     1,258  .036155317   {txt}Root MSE        =   {res}  .0927
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   log_sp500{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}date {c |}{col 14}{res}{space 2} .0003149{col 26}{space 2} 4.96e-06{col 37}{space 1}   63.53{col 46}{space 3}0.000{col 54}{space 4} .0003052{col 67}{space 3} .0003246
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 1.163384{col 26}{space 2} .1098222{col 37}{space 1}   10.59{col 46}{space 3}0.000{col 54}{space 4} .9479289{col 67}{space 3} 1.378839
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. predict uhat, residuals
+{txt}(46 missing values generated)
+
+{com}. tsline uhat
+{res}{txt}
+{com}. ac uhat, lags(200)
+{txt}(note: time series has 273 gaps)
+{res}{txt}
+{com}. 
+. reg L(0/1).log_sp500 L(0/1).date
+{txt}note: L.date omitted because of collinearity
+
+      Source {c |}       SS           df       MS      Number of obs   ={res}       985
+{txt}{hline 13}{c +}{hline 34}   F(2, 982)       > {res} 99999.00
+{txt}       Model {c |} {res}  35.233192         2   17.616596   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} .172974719       982  .000176145   {txt}R-squared       ={res}    0.9951
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.9951
+{txt}       Total {c |} {res} 35.4061667       984  .035981877   {txt}Root MSE        =   {res} .01327
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   log_sp500{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}log_sp500 {c |}
+{space 9}L1. {c |}{col 14}{res}{space 2} .9882552{col 26}{space 2}  .004566{col 37}{space 1}  216.44{col 46}{space 3}0.000{col 54}{space 4} .9792949{col 67}{space 3} .9972155
+{txt}{space 12} {c |}
+{space 8}date {c |}
+{space 9}--. {c |}{col 14}{res}{space 2} 3.72e-06{col 26}{space 2} 1.65e-06{col 37}{space 1}    2.26{col 46}{space 3}0.024{col 54}{space 4} 4.94e-07{col 67}{space 3} 6.95e-06
+{txt}{space 9}L1. {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0136371{col 26}{space 2} .0185934{col 37}{space 1}    0.73{col 46}{space 3}0.463{col 54}{space 4}-.0228503{col 67}{space 3} .0501244
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. predict yhat2
+{txt}(option {bf:xb} assumed; fitted values)
+(299 missing values generated)
+
+{com}. tsline yhat2 log_sp500
+{res}{txt}
+{com}. 
+. 
+. 
+. *Breusch-Godfrey test
+. reg log_sp500 date
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     1,259
+{txt}{hline 13}{c +}{hline 34}   F(1, 1257)      = {res}  4036.11
+{txt}       Model {c |} {res} 34.6820623         1  34.6820623   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 10.8013271     1,257  .008592941   {txt}R-squared       ={res}    0.7625
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.7623
+{txt}       Total {c |} {res} 45.4833894     1,258  .036155317   {txt}Root MSE        =   {res}  .0927
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   log_sp500{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}date {c |}{col 14}{res}{space 2} .0003149{col 26}{space 2} 4.96e-06{col 37}{space 1}   63.53{col 46}{space 3}0.000{col 54}{space 4} .0003052{col 67}{space 3} .0003246
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 1.163384{col 26}{space 2} .1098222{col 37}{space 1}   10.59{col 46}{space 3}0.000{col 54}{space 4} .9479289{col 67}{space 3} 1.378839
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. estat bgodfrey, lags(1)
+
+{txt}Number of gaps in sample:  {res}273
+
+{txt}Breusch-Godfrey LM test for autocorrelation
+{hline 13}{c TT}{hline 61}
+{col 5}lags({it:p}){col 14}{c |}{col 25}chi2{col 44}df{col 63}Prob > chi2
+{hline 13}{c +}{hline 61}
+{col 6}  1{col 14}{c |}{res}{col 20}   961.833{col 43}  1{col 63}  0.0000
+{txt}{hline 13}{c BT}{hline 61}
+{col 25}H0: no serial correlation
+
+{com}. 
+. 
+. *Correction for AR(1) in u
+. reg L(0/1).log_sp500 L(0/1).date
+{txt}note: L.date omitted because of collinearity
+
+      Source {c |}       SS           df       MS      Number of obs   ={res}       985
+{txt}{hline 13}{c +}{hline 34}   F(2, 982)       > {res} 99999.00
+{txt}       Model {c |} {res}  35.233192         2   17.616596   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} .172974719       982  .000176145   {txt}R-squared       ={res}    0.9951
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.9951
+{txt}       Total {c |} {res} 35.4061667       984  .035981877   {txt}Root MSE        =   {res} .01327
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   log_sp500{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}log_sp500 {c |}
+{space 9}L1. {c |}{col 14}{res}{space 2} .9882552{col 26}{space 2}  .004566{col 37}{space 1}  216.44{col 46}{space 3}0.000{col 54}{space 4} .9792949{col 67}{space 3} .9972155
+{txt}{space 12} {c |}
+{space 8}date {c |}
+{space 9}--. {c |}{col 14}{res}{space 2} 3.72e-06{col 26}{space 2} 1.65e-06{col 37}{space 1}    2.26{col 46}{space 3}0.024{col 54}{space 4} 4.94e-07{col 67}{space 3} 6.95e-06
+{txt}{space 9}L1. {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0136371{col 26}{space 2} .0185934{col 37}{space 1}    0.73{col 46}{space 3}0.463{col 54}{space 4}-.0228503{col 67}{space 3} .0501244
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. predict uhat2, residuals
+{txt}(320 missing values generated)
+
+{com}. ac uhat2
+{txt}(note: time series has 264 gaps)
+{res}{txt}
+{com}. estat bgodfrey, lags(1)
+
+{txt}Number of gaps in sample:  {res}264
+
+{txt}Breusch-Godfrey LM test for autocorrelation
+{hline 13}{c TT}{hline 61}
+{col 5}lags({it:p}){col 14}{c |}{col 25}chi2{col 44}df{col 63}Prob > chi2
+{hline 13}{c +}{hline 61}
+{col 6}  1{col 14}{c |}{res}{col 20}    11.356{col 43}  1{col 63}  0.0008
+{txt}{hline 13}{c BT}{hline 61}
+{col 25}H0: no serial correlation
+
+{com}. 
+. 
+. *--------------------------------------------------
+. * Section  Spurious Regression 
+. *--------------------------------------------------
+. 
+. *time trend
+. reg log_sp500 date
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     1,259
+{txt}{hline 13}{c +}{hline 34}   F(1, 1257)      = {res}  4036.11
+{txt}       Model {c |} {res} 34.6820623         1  34.6820623   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 10.8013271     1,257  .008592941   {txt}R-squared       ={res}    0.7625
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.7623
+{txt}       Total {c |} {res} 45.4833894     1,258  .036155317   {txt}Root MSE        =   {res}  .0927
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   log_sp500{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}date {c |}{col 14}{res}{space 2} .0003149{col 26}{space 2} 4.96e-06{col 37}{space 1}   63.53{col 46}{space 3}0.000{col 54}{space 4} .0003052{col 67}{space 3} .0003246
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 1.163384{col 26}{space 2} .1098222{col 37}{space 1}   10.59{col 46}{space 3}0.000{col 54}{space 4} .9479289{col 67}{space 3} 1.378839
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. predict yhat
+{txt}(option {bf:xb} assumed; fitted values)
+
+{com}. tsline yhat log_sp500
+{res}{txt}
+{com}. 
+. 
+. *we have find one trend
+. tsline yhat log_sp500
+{res}{txt}
+{com}. 
+. *generate another time series data containing trend
+. gen e = rnormal(0,1)
+{txt}
+{com}. gen C = 1 + 0.0025 * date + e
+{txt}
+{com}. 
+. *spurious regression
+. reg log_sp500 C
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     1,259
+{txt}{hline 13}{c +}{hline 34}   F(1, 1257)      = {res}  1093.07
+{txt}       Model {c |} {res} 21.1552877         1  21.1552877   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 24.3281017     1,257  .019354098   {txt}R-squared       ={res}    0.4651
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.4647
+{txt}       Total {c |} {res} 45.4833894     1,258  .036155317   {txt}Root MSE        =   {res} .13912
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   log_sp500{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}C {c |}{col 14}{res}{space 2} .0791349{col 26}{space 2} .0023936{col 37}{space 1}   33.06{col 46}{space 3}0.000{col 54}{space 4} .0744391{col 67}{space 3} .0838308
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 3.676479{col 26}{space 2} .1350167{col 37}{space 1}   27.23{col 46}{space 3}0.000{col 54}{space 4} 3.411596{col 67}{space 3} 3.941362
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. 
+. *another example
+. gen ex = rnormal(0,1)
+{txt}
+{com}. gen ey = rnormal(0,1)
+{txt}
+{com}. *alpha_y = 1.6
+. *alpha_x = 0.8 
+. gen X = 1 + 0.8 * date + ex
+{txt}
+{com}. gen Y = 0.2 + 1.6 * date + ey
+{txt}
+{com}. 
+. reg Y X
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     1,305
+{txt}{hline 13}{c +}{hline 34}   F(1, 1303)      > {res} 99999.00
+{txt}       Model {c |} {res}  929253814         1   929253814   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 6514.44208     1,303  4.99957182   {txt}R-squared       ={res}    1.0000
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    1.0000
+{txt}       Total {c |} {res}  929260329     1,304  712622.951   {txt}Root MSE        =   {res}  2.236
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}           Y{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 11}X {c |}{col 14}{res}{space 2} 2.000044{col 26}{space 2} .0001467{col 37}{space 1} 1.4e+04{col 46}{space 3}0.000{col 54}{space 4} 1.999757{col 67}{space 3} 2.000332
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-2.590254{col 26}{space 2}  2.60065{col 37}{space 1}   -1.00{col 46}{space 3}0.319{col 54}{space 4}-7.692175{col 67}{space 3} 2.511666
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. *alpha_y / alpha_x =2
+. 
+. 
+. 
+. *--------------------------------------------------
+. * Section  CPI monthly
+. *--------------------------------------------------
+. 
+.  
+. 
+. *Download CPI monthly  inflation (both index, Y,  and percentage changes, d 
+. * log Y)  
+. *1970-2022 https://fred.stlouisfed.org/series/CPILFESL . 
+. * Discuss that Index is *trending upwards, but after doing percentage changes,
+. * it wiggles around the mean.
+. 
+. 
+. import excel "data/CPIAUCSL.xls", firstrow clear 
+{res}{txt}
+{com}. 
+. rename DATE date
+{res}{txt}
+{com}. rename CPIAUCSL y
+{res}{txt}
+{com}. 
+. format date %td
+{txt}
+{com}. tsset date
+{res}{txt}{col 9}time variable:  {res}{col 25}date, 01jan1970 to 01jan2022, but with gaps
+{txt}{col 17}delta:  {res}1 day
+{txt}
+{com}. 
+. 
+. *extract month and year
+. gen mth = month(date) 
+{txt}
+{com}. gen yr = year(date)
+{txt}
+{com}. 
+. *generate a new monthly time index
+. gen month = ym(yr,mth)
+{txt}
+{com}. format month %tm
+{txt}
+{com}. tsset month
+{res}{txt}{col 9}time variable:  {res}{col 25}month, 1970m1 to 2022m1
+{txt}{col 17}delta:  {res}1 month
+{txt}
+{com}. 
+. *or
+. *gen mdate = mofd(date2)
+. *format mdate %tm
+. 
+. tsline y
+{res}{txt}
+{com}. 
+. ac y, lags(200)
+{res}{txt}
+{com}. 
+. *two ways to calculate percentage change, which is actually inflation
+. gen logy = log(y)
+{txt}
+{com}. gen dlogy = logy - logy[_n-1]
+{txt}(1 missing value generated)
+
+{com}. gen pcy = (y-y[_n-1])/y[_n-1]
+{txt}(1 missing value generated)
+
+{com}. tsline dlogy pcy
+{res}{txt}
+{com}. 
+. 
+. ac logy, lags(200)
+{res}{txt}
+{com}. 
+. *For CPI percentage changes compute mean  and AC function. 
+. * How many AC lags are *statistically significant?
+. 
+. sum dlogy
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 7}dlogy {c |}{res}        624    .0032159    .0032814  -.0178642   .0179377
+{txt}
+{com}. ac dlogy, lag(400)
+{res}{txt}
+{com}. 
+. 
+. * Compute differences in CPI percentage changes, dd log Y, make TS plot. 
+. * How many AC lags are statistically for dd log Y ?
+. * Computing first differences to try to get a stationary process
+. 
+. gen ddlogy = dlogy - dlogy[_n-1]
+{txt}(2 missing values generated)
+
+{com}. tsline ddlogy
+{res}{txt}
+{com}. ac ddlogy, lag(500)
+{res}{txt}
+{com}. 
+. 
+. *For an insight of why we would want a stationary process, please check
+. *your textbook and
+. * https://www.tylervigen.com/spurious-correlations
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. *===========================================================
+. log close 
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\mahdi\are256b-W24\week7.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}29 Feb 2024, 18:01:27
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

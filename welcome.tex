@@ -176,6 +176,43 @@ sample.
 \end{itemize}
 \end{frame}
 
+%----------------------------------------------------------------------------%
+\begin{frame}{Week 8}
+%----------------------------------------------------------------------------%
+
+Pooled OLS
+
+$$
+Y_it = \beta_0 + \beta X_{it} + u_{it}
+$$
+
+for causal interpretation we need exogeneity
+$\mathbb{E}[u_{it}|X_{it}]=0$
+
+This rules out that $W_i$, $W_t$, or $W_{it}$ exist.
+
+FE model with State + time fixed effects
+
+$$
+Y_{it} = \beta_0 + \beta_1 X_{1it} + \beta_2 X_{2it} + \dots + \beta_k X_{kit}
+ + \alpha_i + \lambda_t + u_{it}
+$$
+
+
+FE Model with State FEs + time FEs + State-level time trends
+
+$$
+Y_{it} = \beta_0 + \beta_1 X_{1it} + \beta_2 X_{2it} + \dots + \beta_k X_{kit}
+ + \alpha_i + \lambda_t + \gamma_i t + u_{it}
+$$
+
+We are not controlling for any omitted var that is changing over time. That is 
+if we believe that there exist an omitted variable that is changing over time
+we can not have causal interpretation for the $\beta$.
+
+
+ 
+
 
 %----------------------------------------------------------------------------%
 \begin{frame}{Links}

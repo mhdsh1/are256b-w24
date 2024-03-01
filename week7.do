@@ -160,13 +160,13 @@ gen resid_lag1 = resid[_n-1]
 *iv)Perform the auxiliary regression of the residual on its own lag and the regressor grres.
 *v) Compute the Breusch-Godfrey statistic using nR2 from the above regression.	
 
-// method 1 
+// method 1 for procedure 1
 // for p = 1
 
 reg resid x  resid_lag
 esttab, se r2
 
-// method 2
+// method 2 for procedure 1
 // for p =1
 reg resid x L(1/1).resid
 esttab, se r2
@@ -197,7 +197,7 @@ In contrast, dis chi2tail(1,3.8414588) will return .05
 chisq test -- https://www.wikiwand.com/en/Chi-squared_test
 */
 
-*--- Section 2_2: using Stata command bgodfrey
+*--- Section 2_2: procedure 2 using Stata command bgodfrey
 
 reg resid x
 
@@ -215,7 +215,8 @@ estat bgodfrey, lags(20)
 
 *compute the p you need
 *for large sample, we can use p = 0.75*T^(1/3)
-* scalar p = floor(0.75*e(N)^(1/3))
+
+scalar p = floor(0.75*e(N)^(1/3))
 
 reg p x, robust
 newey p x, lag(6) force

@@ -1,10 +1,10 @@
 *--------------------------------------------------
-*ARE 256b W24 -- Week 8
-*week8.do
-*Mar/1/2024
+*ARE 256b W24 -- Week Xm1
+*weekXm1.do
+*Feb/29/2024
 *Mahdi Shams (mashams@ucdavis.edu)
 *Based on Bulat's Slides, and previous work by Armando Rangel Colina & Zhiran Qin
-*This code is prepared for the Week 9 of ARE 256B TA Sections. 
+*This code is prepared for the week 7 of ARE 256B TA Sections. 
 *--------------------------------------------------
 
 *--------------------------------------------------
@@ -16,209 +16,208 @@ clear all               // Start with a clean slate
 set linesize 80         // Line size limit to make output more readable
 macro drop _all         // clear all macros
 capture log close       // Close existing log files
-log using week8, replace // Open log file
+log using week7, replace // Open log file
 *--------------------------------------------------
 
 *set working directory 
-global path = "C:\Users\mahdi\are256b-w24"
+global path = "C:\Users\mahdi\are256b-W24"
 cd $path
 
 
 *--------------------------------------------------
-* Section 1: Slides 92 - 93: FE in Stata
+* Section Random Walk
 *--------------------------------------------------
 
-use data\Guns.dta,clear
-		
-		
-*Declare the dataset as a panel
-xtset stateid year, yearly
+*use S&P 500 index data
+import excel "data/SP500.xls", firstrow clear 
 
 
-*Let us look at the data over time
-*State 11 has very very large numbers so it looks weird in the same
-*graph
-//twoway (line vio year), by(stateid)
-//twoway (line vio year if stateid!=11), by(stateid)
-twoway (line vio year if stateid==11), by(stateid)
+rename DATE date
+rename SP500 sp500
+destring sp500, replace
+
+*we use "format" to make date readable
+format date %td
+tsset date
 
 
-*plain-vanilla:
-xtreg vio shall, fe
+tsline sp500
+
+gen log_sp500 = log(sp500)
+tsline log_sp500
+
+*Only check data before the pandemic
+*till Feb 14th, 2020
+*keep if date<21960
+
+tsline log_sp500
 
 
-*plain-vanilla with robust standard errors:
-*Robust standard errors cluster over cross-sectional units
-*allowing for arbitrary heteroskedasticity and serial correlation within cross-sectional units
-xtreg vio shall, fe vce(robust)
+reg log_sp500 L1.log_sp500
 
 
-*Least Squares Dummy Variable Regression
-reg vio shall i.stateid
-
-* note that \beta1_FE = \beta1_LSDV (slide 89) 
-
-*including time fixed effects:
-*i.year creates a dummy variable for each unique value of year
-eststo: qui reg vio shall i.stateid i.year
-esttab, se 
-
-eststo: qui xtreg vio shall i.year, fe
-esttab, se 
-
-eststo: xtreg vio shall i.year, fe vce(robust)
-esttab, se 
+*testing against rho=1
+* find the tstat
+*dis (1/se)*(rhoh -1) 
 
 
+*unit root
+* Dealing Nonstationary Time Series: Taming the Tiger
+*calculate daily returns/ first difference
 
+gen dlog_sp500 = log_sp500 - log_sp500[_n-1]
+tsline dlog_sp500
 
-*including time fixed effects and state-level time trends (slide 91) 
-xtreg vio shall i.year c.year#i.stateid, fe 
-
-*c.year deals with year as a continuous variable, 
-*whereas i.stateid creates a dummy variable for each unique value of stateid. 
-*# interacts each state dummy variable with the continuous year trend.
-reg vio shall c.year 
-reg vio shall year
-
-reg vio shall c.year#i.stateid
-reg vio shall c.year#stateid
-
-reg vio shall year#i.stateid
-reg vio shall i.year#i.stateid
-
-
-
-*including the time-invariant regressor z:
-gen z = 10*sqrt(stateid)
-xtreg vio shall i.year#c.z, fe vce(robust)
-
-*The above create year-specific coefficients for z. 
-*Of course you can also include the time fixed effects and state-level time trends.
-
-*--------------------------------------------------
-* Section 2: HW4 Gun Control 
-*--------------------------------------------------
-
-*1a
-*Regular regressions
-eststo clear
-eststo: quietly reg vio shall year avginc pm1029 density pop, robust
-esttab, se ar2
-
-
-*1b
-*Random Effect regressions
-eststo: quietly xtreg vio shall year avginc pm1029 density pop, re vce(robust)
-esttab, se r2
-
-
-*1c
-eststo: quietly xtreg vio shall year avginc pm1029 density pop, fe vce(robust)
-esttab, se r2
-
-*1e
-
-*Fixed effects regressions
-xtreg vio shall year avginc pm1029 density pop, fe
-estimates store fe_vio
-
-*Random effects regressions
-xtreg vio shall year avginc pm1029 density pop, re
-estimates store re_vio
-
-hausman fe_vio re_vio, sigmamore
-*RE assumption is rejected
+ac dlog_sp500, lags(200)
 
 
 *--------------------------------------------------
-* Section 3: HW4 Seat Belt  
+* Section Time Trend
 *--------------------------------------------------
 
-use data\SeatBelts.dta,clear
+*use S&P 500 index data
+
+tsline sp500
+
+*Only check data before the pandemic
+*till Feb 14th, 2020
+*keep if date1<21960
+
+*detrend
+reg log_sp500 date
+predict uhat, residuals
+tsline uhat
+ac uhat, lags(200)
+
+reg L(0/1).log_sp500 L(0/1).date
+predict yhat2
+tsline yhat2 log_sp500
 
 
-*Declare the dataset as a panel
-xtset fips year, yearly
 
-*2a
-generate dk_spd=drinkage21*speed70
-
-eststo clear
-*first case (without time fixed effects)
-eststo:  xtreg fatalityrate sb_useage drinkage21 dk_spd, fe vce(robust)
-*second case (include time fixed effects) (+ i.year)
-
-*third case (include time fixed effects & state-level trends) (+ i.year and c.year#fips)
+*Breusch-Godfrey test
+reg log_sp500 date
+estat bgodfrey, lags(1)
 
 
-esttab, se r2
-
-***sidenote1***
-*another way for interaction term, using # ... almost the same
-reg fatalityrate sb_useage drinkage21 drinkage21#speed70
-reg fatalityrate sb_useage drinkage21 dk_spd
-
-*why?
-br drinkage21 if speed70 ==1
-reg  fatalityrate sb_useage  drinkage21#speed70
-
-*drinkage21 and speed70 are treated as categorical values. 
-*Although we see a 0 and a 1 STATA reads the zero as a "NO" and the 1 as a "YES". 
-*Then, when we ask STATA to do an operation *like YES-YES it doesn't know what to do.
-*So we can do a quick workaround:    
-gen yy  = (drinkage21==1 & speed70==1)
-gen yn  = (drinkage21==1 & speed70==0)
-gen ny  = (drinkage21==0 & speed70==1)
-gen nn  = (drinkage21==0 & speed70==0)
-reg  fatalityrate sb_useage yy yn  
-***end of sidenote1***
-
-*2b
-*Create a variable that indicates the driver had a higher 
-*alcohol content in the blood 
-* known as DUI (driving under the influence)
-gen dui = 1- ba08
+*Correction for AR(1) in u
+reg L(0/1).log_sp500 L(0/1).date
+predict uhat2, residuals
+ac uhat2
+estat bgodfrey, lags(1)
 
 
-*repeat regressions for 3 cases
-			
-eststo clear
+*--------------------------------------------------
+* Section  Spurious Regression 
+*--------------------------------------------------
 
-*first case (without time fixed effects)
-eststo:  xtreg fatalityrate speed65#speed70 if dui==1 ,fe vce(robust)
-*second case (include time fixed effects)
-
-*third case (include time fixed effects & state-level trends)
-
-
-esttab, se r2
-
-*double check
-br speed65 if speed70==1
+*time trend
+reg log_sp500 date
+predict yhat
+tsline yhat log_sp500
 
 
-*2c 
-*year dummies
-*why omit 1983?
-foreach t of numlist 1984/1997 {
-gen  yr`t'=1 if year == `t'
-replace yr`t'=0 if yr`t' == .
-}
+*we have find one trend
+tsline yhat log_sp500
 
-*both with constant, equal to beta_0 + year fixed effect of 1983
-reg fatalityrate sb_useage drinkage21 dk_spd yr*
-reg fatalityrate sb_useage drinkage21 dk_spd i.year
+*generate another time series data containing trend
+gen e = rnormal(0,1)
+gen C = 1 + 0.0025 * date + e
+
+*spurious regression
+reg log_sp500 C
 
 
-*omit 1983 since take first difference
-*this is for case 2
-reg D.(fatalityrate sb_useage drinkage21 dk_spd) i.year ,   vce(cluster fips)
-reg D.(fatalityrate sb_useage drinkage21 dk_spd yr*), nocons  vce(cluster fips)
+*another example
+gen ex = rnormal(0,1)
+gen ey = rnormal(0,1)
+*alpha_y = 1.6
+*alpha_x = 0.8 
+gen X = 1 + 0.8 * date + ex
+gen Y = 0.2 + 1.6 * date + ey
 
-*case 3
-reg D.(fatalityrate sb_useage drinkage21 dk_spd) i.year i.fips,   vce(cluster fips)
-xtreg D.(fatalityrate sb_useage drinkage21 dk_spd) i.year , fe  vce(cluster fips)
+reg Y X
+*alpha_y / alpha_x =2
+
+
+
+*--------------------------------------------------
+* Section  CPI monthly
+*--------------------------------------------------
+
+ 
+
+*Download CPI monthly  inflation (both index, Y,  and percentage changes, d 
+* log Y)  
+*1970-2022 https://fred.stlouisfed.org/series/CPILFESL . 
+* Discuss that Index is *trending upwards, but after doing percentage changes,
+* it wiggles around the mean.
+
+
+import excel "data/CPIAUCSL.xls", firstrow clear 
+
+rename DATE date
+rename CPIAUCSL y
+
+format date %td
+tsset date
+
+
+*extract month and year
+gen mth = month(date) 
+gen yr = year(date)
+
+*generate a new monthly time index
+gen month = ym(yr,mth)
+format month %tm
+tsset month
+
+*or
+*gen mdate = mofd(date2)
+*format mdate %tm
+
+tsline y
+
+ac y, lags(200)
+
+*two ways to calculate percentage change, which is actually inflation
+gen logy = log(y)
+gen dlogy = logy - logy[_n-1]
+gen pcy = (y-y[_n-1])/y[_n-1]
+tsline dlogy pcy
+
+
+ac logy, lags(200)
+
+*For CPI percentage changes compute mean  and AC function. 
+* How many AC lags are *statistically significant?
+
+sum dlogy
+ac dlogy, lag(400)
+
+
+* Compute differences in CPI percentage changes, dd log Y, make TS plot. 
+* How many AC lags are statistically for dd log Y ?
+* Computing first differences to try to get a stationary process
+
+gen ddlogy = dlogy - dlogy[_n-1]
+tsline ddlogy
+ac ddlogy, lag(500)
+
+
+*For an insight of why we would want a stationary process, please check
+*your textbook and
+* https://www.tylervigen.com/spurious-correlations
+
+
+
+
+
+
+
+
+
+
 
 
 *===========================================================

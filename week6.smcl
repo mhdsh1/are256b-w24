@@ -1,0 +1,234 @@
+{smcl}
+{txt}{sf}{ul off}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\mahdi\are256b-W24\week6.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}16 Feb 2024, 16:12:10
+{txt}
+{com}. *--------------------------------------------------
+. 
+. *set working directory 
+. global path = "C:\Users\mahdi\are256b-W24"
+{txt}
+{com}. cd $path
+{res}C:\Users\mahdi\are256b-W24
+{txt}
+{com}. 
+. *--------------------------------------------------
+. * Section 1: White noise, MA(1), AR(1)  
+. *--------------------------------------------------
+. 
+. *Generate White noise, MA(1), AR(1) processes using the codes from the slides. 
+. *Make *autocorrelation plots  for T=100 and 1000 to illustrate consistency.
+. 
+. browse 
+{txt}
+{com}. 
+. clear all
+{txt}
+{com}. set more off
+{txt}
+{com}. 
+. set obs 1050
+{txt}{p}
+number of observations (_N)  was 0,
+now 1,050
+{p_end}
+
+{com}. 
+. gen t=[_n]
+{txt}
+{com}. 
+. tsset t // we use this to declare time periods to stata, try help tsset.
+{res}{txt}{col 9}time variable:  {res}{col 25}t, 1 to 1050
+{txt}{col 17}delta:  {res}1 unit
+{txt}
+{com}. 
+. * Let's create the White Noise First. 
+. * white noise is the buidling block of time series.
+. 
+. gen e=rnormal() 
+{txt}
+{com}. 
+. // here we create the WN,by creating using random normal distribution ... 
+. // ... this is white noise beacuase (slide 9): 
+. // (1) the mean is zero and constant 
+. // (2) the variance is not changing over time
+. // (3) and ac is 0 for any lag larger than 0
+. 
+. tsline e if t<100 //Plot the constructed time series
+{res}{txt}
+{com}. 
+. *Create an autocorrelogram (95% confidence interval by default)
+. ac e
+{res}{txt}
+{com}. // autocorrelogram gives the function of autocorrelation function (slide 8) ...
+. // ... as function of lags (\tau in lecture)
+. // We observe that the ac for the white noise is always 0 for all the lags
+. 
+. 
+. 
+. * Let's create the MA1 process
+. // we are going to make the same process as we have on slide 10
+. 
+. * first thing to do is to create the lag of e:
+. gen elag=e[_n-1]
+{txt}(1 missing value generated)
+
+{com}. 
+. * and now we have MA(1)
+. gen yma=0.25+e+elag*.5
+{txt}(1 missing value generated)
+
+{com}. 
+. tsline yma if t<100 // plot the MA(1)
+{res}{txt}
+{com}. 
+. ac yma // plot the autocorrelation
+{res}{txt}
+{com}. 
+. 
+. 
+. * Let's create the AR1 process
+. 
+. gen yar=0.25+e in 1 // we create the y_1 first, assuming y_0 is 0: 
+{txt}(1,049 missing values generated)
+
+{com}. 
+. replace yar=0.25+0.9*yar[_n-1]+e in 2/1050
+{txt}(1,049 real changes made)
+
+{com}. // and then create the following values
+. 
+. tsline yar
+{res}{txt}
+{com}. ac yar
+{res}{txt}
+{com}. ac yar,lags(500)
+{res}{txt}
+{com}. 
+. *AR1 with diff parameters  
+. *Plot AR(1) process with rho = 0, 0.4, 0.9 for T=100.
+. 
+. *rho=0
+. gen yar_00=e in 1
+{txt}(1,049 missing values generated)
+
+{com}. replace yar_00=0.25+0*yar_00[_n-1]+e in 2/1050
+{txt}(1,049 real changes made)
+
+{com}. 
+. *rho=0.25
+. gen yar_025=e in 1
+{txt}(1,049 missing values generated)
+
+{com}. replace yar_025=0.25+0.25*yar_025[_n-1]+e in 2/1050
+{txt}(1,049 real changes made)
+
+{com}. 
+. *rho=0.4
+. gen yar_04=e in 1
+{txt}(1,049 missing values generated)
+
+{com}. replace yar_04=0.25+0.4*yar_04[_n-1]+e in 2/1050
+{txt}(1,049 real changes made)
+
+{com}. 
+. *rho=0.9
+. gen yar_09=e in 1
+{txt}(1,049 missing values generated)
+
+{com}. replace yar_09=0.25+0.9*yar_09[_n-1]+e in 2/1050
+{txt}(1,049 real changes made)
+
+{com}. 
+. 
+. tsline yar_00 yar_025 yar_04 yar_09
+{res}{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\mahdi\AppData\Local\Temp\STD00000000.tmp"
+{txt}
+{com}. ac yar_00 
+{res}{txt}
+{com}. ac yar_025 
+{res}{txt}
+{com}. ac yar_04 
+{res}{txt}
+{com}. ac yar_09
+{res}{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\mahdi\AppData\Local\Temp\STD00000000.tmp"
+{txt}
+{com}. ac yar_09
+{res}{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\mahdi\AppData\Local\Temp\STD00000000.tmp"
+{txt}
+{com}. ac yar_04 
+{res}{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\mahdi\AppData\Local\Temp\STD00000000.tmp"
+{txt}
+{com}. ac yar_025 
+{res}{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\mahdi\AppData\Local\Temp\STD00000000.tmp"
+{txt}
+{com}. import excel "data\SP500.xls", firstrow clear 
+{res}{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\mahdi\AppData\Local\Temp\STD00000000.tmp"
+{txt}
+{com}. import delimited "data\CPILFESL.csv",clear
+{res}{err}file data\CPILFESL.csv not found
+{txt}{search r(601):r(601);}
+
+end of do-file
+
+{search r(601):r(601);}
+
+{com}. do "C:\Users\mahdi\AppData\Local\Temp\STD00000000.tmp"
+{txt}
+{com}. import delimited "data/CPILFESL.csv",clear
+{res}{err}file data/CPILFESL.csv not found
+{txt}{search r(601):r(601);}
+
+end of do-file
+
+{search r(601):r(601);}
+
+{com}. do "C:\Users\mahdi\AppData\Local\Temp\STD00000000.tmp"
+{txt}
+{com}. import delimited "data\CPIAUCSL.csv",clear
+{res}{err}Java installation not found
+{txt}{search r(5004):r(5004);}
+
+end of do-file
+
+{search r(5004):r(5004);}
+
+{com}. do "C:\Users\mahdi\AppData\Local\Temp\STD00000000.tmp"
+{txt}
+{com}. import delimited "data\CPIAUCSL.csv",clear
+{res}{err}Java installation not found
+{txt}{search r(5004):r(5004);}
+
+end of do-file
+
+{search r(5004):r(5004);}
+
+{com}. doed
+
+. exit, clear
