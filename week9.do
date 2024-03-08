@@ -16,7 +16,7 @@ clear all               // Start with a clean slate
 set linesize 80         // Line size limit to make output more readable
 macro drop _all         // clear all macros
 capture log close       // Close existing log files
-log using week8, replace // Open log file
+log using week9, replace // Open log file
 *--------------------------------------------------
 
 *set working directory 
@@ -60,7 +60,7 @@ reg vio shall i.stateid
 
 *including time fixed effects:
 *i.year creates a dummy variable for each unique value of year
-eststo: qui reg vio shall i.stateid i.year
+qui reg vio shall i.stateid i.year
 esttab, se 
 
 eststo: qui xtreg vio shall i.year, fe
@@ -82,10 +82,10 @@ reg vio shall c.year
 reg vio shall year
 
 reg vio shall c.year#i.stateid
-reg vio shall c.year#stateid
+#reg vio shall i.year#i.stateid
 
+reg vio shall c.year#stateid
 reg vio shall year#i.stateid
-reg vio shall i.year#i.stateid
 
 
 
@@ -147,34 +147,31 @@ generate dk_spd=drinkage21*speed70
 eststo clear
 *first case (without time fixed effects)
 eststo:  xtreg fatalityrate sb_useage drinkage21 dk_spd, fe vce(robust)
-*second case (include time fixed effects) (+ i.year)
 
-*third case (include time fixed effects & state-level trends) (+ i.year and c.year#fips)
-
-
-esttab, se r2
 
 ***sidenote1***
-*another way for interaction term, using # ... almost the same
+/*another way for interaction term, using # ... almost the same:
 reg fatalityrate sb_useage drinkage21 drinkage21#speed70
 reg fatalityrate sb_useage drinkage21 dk_spd
 
 *why?
 br drinkage21 if speed70 ==1
 reg  fatalityrate sb_useage  drinkage21#speed70
+***end of sidenote1***/
 
-*drinkage21 and speed70 are treated as categorical values. 
-*Although we see a 0 and a 1 STATA reads the zero as a "NO" and the 1 as a "YES". 
-*Then, when we ask STATA to do an operation *like YES-YES it doesn't know what to do.
-*So we can do a quick workaround:    
-gen yy  = (drinkage21==1 & speed70==1)
-gen yn  = (drinkage21==1 & speed70==0)
-gen ny  = (drinkage21==0 & speed70==1)
-gen nn  = (drinkage21==0 & speed70==0)
-reg  fatalityrate sb_useage yy yn  
-***end of sidenote1***
+
+*second case (include time fixed effects) (+ i.year)
+
+
+*third case (include time fixed effects & state-level trends) (+ i.year and c.year#fips)
+
+
+esttab, se r2
+
+
 
 *2b
+
 *Create a variable that indicates the driver had a higher 
 *alcohol content in the blood 
 * known as DUI (driving under the influence)
@@ -199,26 +196,32 @@ br speed65 if speed70==1
 
 
 *2c 
-*year dummies
-*why omit 1983?
-foreach t of numlist 1984/1997 {
-gen  yr`t'=1 if year == `t'
-replace yr`t'=0 if yr`t' == .
-}
 
-*both with constant, equal to beta_0 + year fixed effect of 1983
-reg fatalityrate sb_useage drinkage21 dk_spd yr*
-reg fatalityrate sb_useage drinkage21 dk_spd i.year
+/*sidenote2
+when first differentating we can not use drinkage21#speed70 or dk_spd
+drinkage21 and speed70 are treated as categorical values. 
+Although we see a 0 and a 1 STATA reads the zero as a "NO" and the 1 as a "YES". 
+Then, when we ask STATA to do an operation *like YES-YES it doesn't know what 
+to do. So we can do a quick workaround by creating four new variables and first 
+differentiating them using D. :*/  
+gen yy  = (drinkage21==1 & speed70==1)
+gen yn  = (drinkage21==1 & speed70==0)
+gen ny  = (drinkage21==0 & speed70==1)
+gen nn  = (drinkage21==0 & speed70==0)
 
 
-*omit 1983 since take first difference
-*this is for case 2
-reg D.(fatalityrate sb_useage drinkage21 dk_spd) i.year ,   vce(cluster fips)
-reg D.(fatalityrate sb_useage drinkage21 dk_spd yr*), nocons  vce(cluster fips)
+* case 1 
+eststo: reg D.fatalityrate D.sb_useage D.drinkage21 D.yy D.yn D.ny D.nn, ///
+nocons vce(robust)
 
-*case 3
-reg D.(fatalityrate sb_useage drinkage21 dk_spd) i.year i.fips,   vce(cluster fips)
-xtreg D.(fatalityrate sb_useage drinkage21 dk_spd) i.year , fe  vce(cluster fips)
+* compare with FE regression 
+eststo:  xtreg fatalityrate sb_useage drinkage21 yy yn ny nn, fe vce(robust)
+
+
+* case 2
+
+
+* case 3
 
 
 *===========================================================
